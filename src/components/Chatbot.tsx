@@ -1,26 +1,27 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from 'groq-sdk';
 
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || "");
-const model = genAI.getGenerativeModel({ 
-  model: "gemini-2.0-flash",
-  systemInstruction: `
-    You are an AI assistant for "Elevate Digital Agency" (Sudhanshu's Portfolio). 
-    Your goal is to help users learn about the agency and contact them.
-    
-    Contact Details:
-    - Email: maverricdev@gmail.com
-    - Phone: 7249130838, 9022760216
-    
-    Services: Web Design, App Development, Digital Strategy, SEO, Cyber Security, Performance Optimization.
-    
-    Keep your responses concise, professional, and sophisticated. 
-    If someone asks to contact or hire, provide the email and phone numbers.
-    Be helpful and friendly.
-  `
+const groq = new Groq({ 
+  apiKey: import.meta.env.VITE_GROQ_API_KEY,
+  dangerouslyAllowBrowser: true 
 });
+
+const systemPrompt = `
+  You are an AI assistant for "Elevate Digital Agency" (Sudhanshu's Portfolio). 
+  Your goal is to help users learn about the agency and contact them.
+  
+  Contact Details:
+  - Email: maverricdev@gmail.com
+  - Phone: 7249130838, 9022760216
+  
+  Services: Web Design, App Development, Digital Strategy, SEO, Cyber Security, Performance Optimization.
+  
+  Keep your responses concise, professional, and sophisticated. 
+  If someone asks to contact or hire, provide the email and phone numbers.
+  Be helpful and friendly.
+`;
 
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,25 +51,33 @@ export default function Chatbot() {
     setIsLoading(true);
 
     try {
-      // ✅ Fix: skip the initial bot greeting so history always starts with 'user'
-      const validHistory = messages.filter((_, i) => i !== 0);
+      const chatHistory = messages
+        .filter((_, i) => i !== 0)
+        .map(m => ({
+          role: m.role === 'user' ? 'user' as const : 'assistant' as const,
+          content: m.text,
+        }));
 
-      const chat = model.startChat({
-        history: validHistory.map(m => ({
-          role: m.role === 'user' ? 'user' : 'model',
-          parts: [{ text: m.text }],
-        })),
+      const completion = await groq.chat.completions.create({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...chatHistory,
+          { role: 'user', content: userText }
+        ],
+        model: 'llama3-8b-8192',
+        temperature: 0.7,
+        max_tokens: 500,
       });
 
-      const result = await chat.sendMessage(userText);
-      const responseText = result.response.text();
+      const responseText = completion.choices[0]?.message?.content || 
+        'Sorry, I could not process that. Please try again!';
 
       setMessages(prev => [...prev, { role: 'bot', text: responseText }]);
     } catch (error) {
       console.error('Chatbot error:', error);
       setMessages(prev => [...prev, { 
         role: 'bot', 
-        text: 'Sorry, I encountered an error. Please contact us directly at maverricdev@gmail.com' 
+        text: 'Sorry, I encountered an error. Please contact us at maverricdev@gmail.com' 
       }]);
     } finally {
       setIsLoading(false);
