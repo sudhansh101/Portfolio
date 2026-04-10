@@ -3,21 +3,24 @@ import { motion } from 'motion/react';
 import { Mail, Phone, Send, Loader2 } from 'lucide-react';
 import { useToast } from './Toast';
 
-const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-const EMAILJS_AUTO_REPLY_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_AUTO_REPLY_TEMPLATE_ID;
-const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+// ✅ Fallback to empty string to avoid undefined TypeScript errors
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID ?? '';
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID ?? '';
+const EMAILJS_AUTO_REPLY_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_AUTO_REPLY_TEMPLATE_ID ?? '';
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY ?? '';
 
-// ✅ Reusable function to send email via EmailJS REST API
-const sendEmail = async (templateId: string, templateParams: Record<string, string>) => {
+// ✅ Reusable send function
+const sendEmail = async (
+  templateId: string,
+  templateParams: Record<string, string>
+): Promise<void> => {
   const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       service_id: EMAILJS_SERVICE_ID,
       template_id: templateId,
-      user_id: EMAILJS_PUBLIC_KEY,      // ✅ Correct field name
-      // ❌ Removed: accessToken (wrong/not needed for REST API)
+      user_id: EMAILJS_PUBLIC_KEY,
       template_params: templateParams
     })
   });
@@ -27,8 +30,6 @@ const sendEmail = async (templateId: string, templateParams: Record<string, stri
     console.error('EmailJS error:', errorText);
     throw new Error(errorText);
   }
-
-  return response;
 };
 
 export default function Contact() {
@@ -41,7 +42,9 @@ export default function Contact() {
     message: ''
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
@@ -49,16 +52,18 @@ export default function Contact() {
     e.preventDefault();
     setIsLoading(true);
 
-    // ✅ Debug log - remove after testing
-    console.log('EmailJS Config:', {
-      service: EMAILJS_SERVICE_ID,
-      template: EMAILJS_TEMPLATE_ID,
-      autoReply: EMAILJS_AUTO_REPLY_TEMPLATE_ID,
-      publicKey: EMAILJS_PUBLIC_KEY
-    });
+    // ✅ Issue 2 Fix - Guard against missing ENV variables
+    if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
+      showToast(
+        'Email service not configured. Please contact us directly at maverricdev@gmail.com',
+        'error'
+      );
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      // ✅ Step 1: Send "Contact Us" email to YOU (maverricdev@gmail.com)
+      // ✅ Step 1: Send contact email TO YOU
       await sendEmail(EMAILJS_TEMPLATE_ID, {
         from_name: formData.from_name,
         from_email: formData.from_email,
@@ -67,19 +72,28 @@ export default function Contact() {
         to_email: 'maverricdev@gmail.com'
       });
 
-      // ✅ Step 2: Send "Auto-Reply" email back to the USER
-      await sendEmail(EMAILJS_AUTO_REPLY_TEMPLATE_ID, {
-        from_name: formData.from_name,
-        from_email: formData.from_email,   // ← user receives this auto reply
-        subject: formData.subject,
-        message: formData.message,
-        to_email: formData.from_email      // ← send auto reply TO the user
-      });
+      // ✅ Issue 3 Fix - Auto-reply in separate try/catch
+      // So if auto-reply fails, user still sees success
+      try {
+        await sendEmail(EMAILJS_AUTO_REPLY_TEMPLATE_ID, {
+          from_name: formData.from_name,
+          from_email: formData.from_email,
+          subject: formData.subject,
+          message: formData.message,
+          to_email: formData.from_email
+        });
+      } catch (autoReplyError) {
+        // Auto-reply failed but main email was sent
+        // Don't show error to user - just log it
+        console.error('Auto-reply failed (non-critical):', autoReplyError);
+      }
 
+      // ✅ Show success - main email was sent
       showToast("Message sent! We'll get back to you soon.", 'success');
       setFormData({ from_name: '', from_email: '', subject: '', message: '' });
 
     } catch (error) {
+      // ✅ This only triggers if MAIN email failed
       console.error('Email send error:', error);
       showToast(
         'Failed to send. Please email us directly at maverricdev@gmail.com',
