@@ -5,7 +5,31 @@ import { useToast } from './Toast';
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+const EMAILJS_AUTO_REPLY_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_AUTO_REPLY_TEMPLATE_ID;
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+// ✅ Reusable function to send email via EmailJS REST API
+const sendEmail = async (templateId: string, templateParams: Record<string, string>) => {
+  const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      service_id: EMAILJS_SERVICE_ID,
+      template_id: templateId,
+      user_id: EMAILJS_PUBLIC_KEY,      // ✅ Correct field name
+      // ❌ Removed: accessToken (wrong/not needed for REST API)
+      template_params: templateParams
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('EmailJS error:', errorText);
+    throw new Error(errorText);
+  }
+
+  return response;
+};
 
 export default function Contact() {
   const { showToast } = useToast();
@@ -25,39 +49,42 @@ export default function Contact() {
     e.preventDefault();
     setIsLoading(true);
 
-    console.log('Keys:', { EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY });
+    // ✅ Debug log - remove after testing
+    console.log('EmailJS Config:', {
+      service: EMAILJS_SERVICE_ID,
+      template: EMAILJS_TEMPLATE_ID,
+      autoReply: EMAILJS_AUTO_REPLY_TEMPLATE_ID,
+      publicKey: EMAILJS_PUBLIC_KEY
+    });
 
     try {
-      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          service_id: EMAILJS_SERVICE_ID,
-          template_id: EMAILJS_TEMPLATE_ID,
-          user_id: EMAILJS_PUBLIC_KEY,
-          accessToken: EMAILJS_PUBLIC_KEY,
-          template_params: {
-            from_name: formData.from_name,
-            from_email: formData.from_email,
-            subject: formData.subject,
-            message: formData.message,
-            to_email: 'maverricdev@gmail.com'
-          }
-        })
+      // ✅ Step 1: Send "Contact Us" email to YOU (maverricdev@gmail.com)
+      await sendEmail(EMAILJS_TEMPLATE_ID, {
+        from_name: formData.from_name,
+        from_email: formData.from_email,
+        subject: formData.subject,
+        message: formData.message,
+        to_email: 'maverricdev@gmail.com'
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('EmailJS error response:', errorText);
-        throw new Error(errorText);
-      }
+      // ✅ Step 2: Send "Auto-Reply" email back to the USER
+      await sendEmail(EMAILJS_AUTO_REPLY_TEMPLATE_ID, {
+        from_name: formData.from_name,
+        from_email: formData.from_email,   // ← user receives this auto reply
+        subject: formData.subject,
+        message: formData.message,
+        to_email: formData.from_email      // ← send auto reply TO the user
+      });
 
-      showToast('Message sent! We\'ll get back to you soon.', 'success');
+      showToast("Message sent! We'll get back to you soon.", 'success');
       setFormData({ from_name: '', from_email: '', subject: '', message: '' });
 
     } catch (error) {
-      console.error('Email error:', error);
-      showToast('Failed to send. Please email us directly at maverricdev@gmail.com', 'error');
+      console.error('Email send error:', error);
+      showToast(
+        'Failed to send. Please email us directly at maverricdev@gmail.com',
+        'error'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -76,11 +103,13 @@ export default function Contact() {
               Contact Us
             </span>
             <h2 className="text-4xl md:text-5xl font-serif font-bold mb-8">
-              Let's build something <span className="italic">extraordinary</span> together.
+              Let's build something{' '}
+              <span className="italic">extraordinary</span> together.
             </h2>
             <p className="text-white/60 text-lg mb-12 leading-relaxed">
-              Ready to elevate your digital presence? We're here to help you navigate 
-              the complexities of the digital world with style and precision.
+              Ready to elevate your digital presence? We're here to help you
+              navigate the complexities of the digital world with style and
+              precision.
             </p>
 
             <div className="space-y-8">
@@ -89,16 +118,21 @@ export default function Contact() {
                   <Mail size={20} />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1">Email Us</p>
+                  <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1">
+                    Email Us
+                  </p>
                   <p className="text-lg font-medium">maverricdev@gmail.com</p>
                 </div>
               </div>
+
               <div className="flex items-center gap-6">
                 <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-brand-primary">
                   <Phone size={20} />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1">Call Us</p>
+                  <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1">
+                    Call Us
+                  </p>
                   <p className="text-lg font-medium">7249130838 / 9022760216</p>
                 </div>
               </div>
@@ -114,8 +148,10 @@ export default function Contact() {
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Full Name</label>
-                  <input 
+                  <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">
+                    Full Name
+                  </label>
+                  <input
                     type="text"
                     name="from_name"
                     value={formData.from_name}
@@ -126,8 +162,10 @@ export default function Contact() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Email Address</label>
-                  <input 
+                  <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">
+                    Email Address
+                  </label>
+                  <input
                     type="email"
                     name="from_email"
                     value={formData.from_email}
@@ -138,9 +176,12 @@ export default function Contact() {
                   />
                 </div>
               </div>
+
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Subject</label>
-                <input 
+                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">
+                  Subject
+                </label>
+                <input
                   type="text"
                   name="subject"
                   value={formData.subject}
@@ -150,9 +191,12 @@ export default function Contact() {
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:outline-hidden focus:border-brand-primary/50 transition-colors"
                 />
               </div>
+
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">Message</label>
-                <textarea 
+                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">
+                  Message
+                </label>
+                <textarea
                   rows={5}
                   name="message"
                   value={formData.message}
@@ -162,6 +206,7 @@ export default function Contact() {
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 focus:outline-hidden focus:border-brand-primary/50 transition-colors resize-none"
                 />
               </div>
+
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
