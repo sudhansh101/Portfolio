@@ -123,7 +123,7 @@ export default function Hero() {
           </motion.span>
         </motion.div>
 
-        {/* Headline */}
+        {/* Headline with Typing Effect */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -194,7 +194,7 @@ export default function Hero() {
           </motion.button>
         </motion.div>
 
-        {/* Stats */}
+        {/* Stats Row */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
