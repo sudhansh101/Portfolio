@@ -29,7 +29,6 @@ function useTypingEffect(words: string[], speed = 100) {
         }
       }
     }, isDeleting ? speed / 2 : speed);
-
     return () => clearTimeout(timeout);
   }, [charIndex, isDeleting, wordIndex, words, speed]);
 
@@ -82,7 +81,6 @@ export default function Hero() {
       ref={ref}
       className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20"
     >
-      {/* Background */}
       <motion.div className="absolute inset-0 z-0" style={{ y, opacity }}>
         <motion.div
           animate={{ x: mousePos.x * -1, y: mousePos.y * -1 }}
@@ -107,8 +105,6 @@ export default function Hero() {
       </motion.div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
-
-        {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -123,7 +119,6 @@ export default function Hero() {
           </motion.span>
         </motion.div>
 
-        {/* Headline with Typing Effect */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -143,7 +138,6 @@ export default function Hero() {
           </h1>
         </motion.div>
 
-        {/* Subtext */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -154,7 +148,6 @@ export default function Hero() {
           with cutting-edge technology to help your brand stand out.
         </motion.p>
 
-        {/* Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -194,7 +187,6 @@ export default function Hero() {
           </motion.button>
         </motion.div>
 
-        {/* Stats Row */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -222,7 +214,6 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      {/* Scroll Indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
