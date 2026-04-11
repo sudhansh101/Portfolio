@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://your-portfolio-url.vercel.app/sitemap.xml
+Sitemap: https://elevateandco.vercel.app/sitemap.xml
