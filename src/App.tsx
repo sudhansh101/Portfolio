@@ -12,6 +12,7 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Chatbot from './components/Chatbot';
 import { ToastProvider } from './components/Toast';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
         </main>
         <Footer />
         <Chatbot />
+        <SpeedInsights />
       </div>
     </ToastProvider>
   );
