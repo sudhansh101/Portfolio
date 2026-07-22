@@ -273,39 +273,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FOUNDERS */}
-      <section className="section-padding border-t hairline">
-        <p className="eyebrow mb-14">Who's building this</p>
-        <div className="grid gap-6 md:grid-cols-2">
-          {FOUNDERS_DATA.map((founder, i) => (
-            <motion.div
-              key={founder.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-            >
-              <TiltCard className="p-8" glare={false}>
-                <div className="flex items-center gap-4">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-linear-to-br from-accent/30 to-accent-2/30 font-display text-lg font-semibold">
-                    {founder.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium">{founder.name}</h3>
-                    <p className="font-mono text-xs uppercase tracking-wider text-accent">{founder.role}</p>
-                  </div>
-                </div>
-                <p className="mt-5 text-sm leading-relaxed text-white/60">{founder.bio}</p>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {founder.tags.map((t) => (
-                    <span key={t} className="chip">{t}</span>
-                  ))}
-                </div>
-              </TiltCard>
-            </motion.div>
-          ))}
-        </div>
-      </section>
 
       {/* REVIEWS */}
       <section className="section-padding border-t hairline">
