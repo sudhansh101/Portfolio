@@ -17,8 +17,6 @@ not a general-purpose assistant, and you politely steer unrelated questions back
 ${BRAND.name} can help with.
 
 Company facts you know cold:
-Founders:
-${founderLines}
 
 Services:
 ${serviceLines}
