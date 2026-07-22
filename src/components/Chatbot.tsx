@@ -2,12 +2,11 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageCircle, X, Send, Sparkles } from 'lucide-react';
 import Groq from 'groq-sdk';
-import { BRAND, SERVICES_DATA, PROJECTS_DATA, FOUNDERS_DATA } from '../data/content';
+import { BRAND, SERVICES_DATA, PROJECTS_DATA} from '../data/content';
 
 const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
 const groq = groqApiKey ? new Groq({ apiKey: groqApiKey, dangerouslyAllowBrowser: true }) : null;
 
-const founderLines = FOUNDERS_DATA.map((f) => `- ${f.name} (${f.role}): ${f.bio}`).join('\n');
 const serviceLines = SERVICES_DATA.map((s) => `- ${s.title}: ${s.shortDesc}`).join('\n');
 const projectLines = PROJECTS_DATA.map((p) => `- ${p.title} (${p.category}): ${p.shortDesc}`).join('\n');
 
