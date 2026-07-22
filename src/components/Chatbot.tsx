@@ -18,6 +18,10 @@ ${BRAND.name} can help with.
 
 Company facts you know cold:
 
+Founders:
+- Sudhanshu Agrawal: Co-Founder & Lead Engineer
+- Veer singh Pujari: Co-Founder & Product Lead
+
 Services:
 ${serviceLines}
 
