@@ -12,21 +12,6 @@ export const BRAND = {
   },
 };
 
-export const FOUNDERS_DATA = [
-  {
-    name: 'Sudhanshu Agrawal',
-    role: 'Co-Founder & Lead Engineer',
-    bio: 'Drives the architecture behind every build — from full-stack web platforms to the systems powering Jarvis 2.0.',
-    tags: ['Full-Stack', 'System Design', 'AI/ML'],
-  },
-  {
-    name: 'Virendra Singh Pujari',
-    role: 'Co-Founder & Product Lead',
-    bio: 'Shapes product strategy and client delivery, turning ambitious ideas into shipped, working software.',
-    tags: ['Product Strategy', 'Client Delivery', 'Automation'],
-  },
-];
-
 export const NAV_LINKS = [
   { label: 'Home', path: '/' },
   { label: 'Services', path: '/services' },
