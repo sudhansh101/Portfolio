@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowUpRight, Plus, Minus, Mic, Hand, Wrench, Sparkles } from 'lucide-react';
-import { SERVICES_DATA, PROJECTS_DATA, REVIEWS_DATA, FOUNDERS_DATA, BRAND } from '../data/content';
+import { SERVICES_DATA, PROJECTS_DATA, REVIEWS_DATA, BRAND } from '../data/content';
 import Aurora from '../components/Aurora';
 import FloatingTech from '../components/FloatingTech';
 import CodeTerminal from '../components/CodeTerminal';
