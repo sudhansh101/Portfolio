@@ -12,9 +12,12 @@ export default defineConfig(({ mode }) => {
       tailwindcss(),
       sitemap({
         hostname: 'https://mavandco.vercel.app',
-        routes: [
-          '/',  // Only ONE route since it's a single page app
-        ],
+       routes: [
+    '/',
+    '/services',
+    '/work',
+    '/contact',
+  ],
         exclude: [
           '/googlebe533950b56dd6b2', // ✅ Exclude google verification file
         ],
@@ -25,7 +28,7 @@ export default defineConfig(({ mode }) => {
     ],
 
     define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+      'process.env.GROQ_API_KEY': JSON.stringify(env.GROQ_API_KEY),
     },
 
     resolve: {
