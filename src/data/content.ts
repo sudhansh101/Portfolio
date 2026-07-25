@@ -1,6 +1,6 @@
 export const BRAND = {
   name: 'MAV&CO',
-  full: 'Elevate Digital Agency',
+  full: 'MavandCo. Digital Agency',
   email: 'maverricdev@gmail.com',
   phone: ['+91 72491 30838', '+91 90227 60216'],
   whatsapp: '917249130838',
