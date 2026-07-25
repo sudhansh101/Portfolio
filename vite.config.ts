@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
       tailwindcss(),
       sitemap({
         hostname: 'https://mavandco.vercel.app',
-       routes: [
+       dynamicRoutes: [
     '/',
     '/services',
     '/work',
