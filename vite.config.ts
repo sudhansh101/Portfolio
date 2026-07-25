@@ -13,11 +13,10 @@ export default defineConfig(({ mode }) => {
       sitemap({
         hostname: 'https://mavandco.vercel.app',
        dynamicRoutes: [
-    '/',
-    '/services',
-    '/work',
-    '/contact',
-  ],
+  '/services',
+  '/work',
+  '/contact',
+],
         exclude: [
           '/googlebe533950b56dd6b2', // ✅ Exclude google verification file
         ],
