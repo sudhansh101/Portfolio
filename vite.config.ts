@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
       react(), 
       tailwindcss(),
       sitemap({
-        hostname: 'https://elevateandco.vercel.app',
+        hostname: 'https://mavandco.vercel.app',
         routes: [
           '/',  // Only ONE route since it's a single page app
         ],
